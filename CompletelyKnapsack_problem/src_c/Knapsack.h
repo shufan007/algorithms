@@ -37,7 +37,7 @@ typedef struct{
     int    Costs1[MaxCaseKinds]; 
     float Costs2[MaxCaseKinds];
     int    limitCost1;
-    int    limitCost2;    
+    float limitCost2;    
 }Knapsack_T;
 
 
