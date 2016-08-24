@@ -34,6 +34,8 @@
 #define RIGHT(i)   ((i<<1)+2)
 
 
+int CKnapsack::m_count  = 0;
+
 CKnapsack::CKnapsack(){}
 
 CKnapsack::CKnapsack(const Knapsack_T* knapsack, TopList_T* topList):m_priorityQueue(topList)
@@ -42,10 +44,18 @@ CKnapsack::CKnapsack(const Knapsack_T* knapsack, TopList_T* topList):m_priorityQ
 	assert(topList != NULL);
 		
 	m_traceFp        = NULL;
-	m_count            = 0;
-	CombinationSearchCommonInit(knapsack);
+	
+	memcpy(&m_knapsack, knapsack, sizeof(Knapsack_T));
+
+	AllocInfoInit();
+
+#ifdef __DEBUE__
+	TraceFileInit();    
+#endif	
 	
 	m_topList = topList;
+
+	m_count++; 
 	
 }
 
@@ -86,19 +96,6 @@ void CKnapsack::KnapsackCombinationSearch()
 
 }//----------------------------------------------------------------------------------
 
-
-void CKnapsack::CombinationSearchCommonInit(const Knapsack_T *knapsack)
-{
-    m_count++; 
-    memcpy(&m_knapsack, knapsack, sizeof(Knapsack_T));
-
-   AllocInfoInit();
-
-#ifdef __DEBUE__
-    TraceFileInit();    
-#endif
-
-}
 
 void CKnapsack::AllocInfoInit()
 {
@@ -287,17 +284,17 @@ void CKnapsack::SearchingLogTrace()
         fprintf(m_traceFp, "\n    "); 
     }    
     fprintf(m_traceFp, " [value:%d; cost1:%d; cost2:%.1f] ", m_allocInfo.Combin.value, m_allocInfo.Combin.cost1, m_allocInfo.Combin.cost2);  
-    PrintArrayToFile(m_traceFp, m_allocInfo.Combin.combinId, printNum);
+    PrintArrayToTraceFile(m_allocInfo.Combin.combinId, printNum);
 }
 
-void CKnapsack::PrintArrayToFile(FILE* fp, int array[], int printLen)
+void CKnapsack::PrintArrayToTraceFile(int array[], int printLen)
 {
     int i;
     for ( i=0; i<printLen; i++) 
     {
-        fprintf(fp, "%d ", array[i]);
+        fprintf(m_traceFp, "%d ", array[i]);
     }    
-    //fprintf(fp, "\n");
+    //fprintf(m_traceFp, "\n");
 }
 
 

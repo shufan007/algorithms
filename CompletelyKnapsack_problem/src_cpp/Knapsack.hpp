@@ -1,8 +1,8 @@
 /************************************************************************************
        [Header File:] Header File
        Function:       Common definations for Knapsack Combination Search
-       Author:         Fan, Shuangxi (Nokia - CN/Hangzhou)
-       Date:           2016-8-18
+       Author:          Fan, Shuangxi (Nokia - CN/Hangzhou)
+       Date:            2016-8-18
 
  ************************************************************************************/
 
@@ -10,8 +10,6 @@
 #define _KNAPSACK_HPP
 
 #include <string>
-#include <vector>
-#include <map>
 
 /***************************************************
  Constant definitions
@@ -73,21 +71,17 @@ typedef struct{
 class CPriorityQueue
 {
 public:
-
+	
 	CPriorityQueue();
-
 	CPriorityQueue(TopList_T*);
-
 	~CPriorityQueue(void);
-
 
 	void HeapPop();
 	void HeapUpdateTop(CombinStat_T*);
 
-
 private:
+	
 	TopList_T      * m_topList;
-
 	
 	void MinHeapify( int);
 	void HeapPush(CombinStat_T*);
@@ -157,9 +151,7 @@ class CKnapsack
 public:
 
 	CKnapsack();
-
 	CKnapsack(const Knapsack_T*, TopList_T*);
-
 	~CKnapsack(void);
 
 
@@ -179,24 +171,22 @@ public:
 private:
 	FILE             * m_traceFp;
 	TopList_T      * m_topList;
-	int                  m_count;
+	static int         m_count;
 	Knapsack_T     m_knapsack;
 	AllocInfo_T      m_allocInfo;
 	CPriorityQueue m_priorityQueue;
-
 	
-void CombinationSearchCommonInit(const Knapsack_T*);
-void AllocInfoInit();
-void TraceFileInit();
-void PrintSearchedStatisticsInfo();
-void AllocateProcess();
-void AllocDownStep();
-void NextAllocationControlProcess();
-void AllocRollbackOneStep();
-void AllocRollbackToBranchRoot();
-void TopListUpdate();
-void SearchingLogTrace();
-void PrintArrayToFile(FILE*, int*, int);
+	void AllocInfoInit();
+	void TraceFileInit();
+	void PrintSearchedStatisticsInfo();
+	void AllocateProcess();
+	void AllocDownStep();
+	void NextAllocationControlProcess();
+	void AllocRollbackOneStep();
+	void AllocRollbackToBranchRoot();
+	void TopListUpdate();
+	void SearchingLogTrace();
+	void PrintArrayToTraceFile( int*, int);
 
 };
 
