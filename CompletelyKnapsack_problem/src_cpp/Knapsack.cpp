@@ -4,7 +4,7 @@
        History:
        
        0.8           (2015 -3 -20)   Implement the algorithm
-       1.0           (2015 -5 -7 )    Reconsitution, 
+       1.0           (2015 -5 -7 )    Code refactoring
  ************************************************************************************/
 //#pragma once
 
@@ -28,11 +28,120 @@
 #define  EPS                0.001     // used for judge the equality of float type
 #define STR_LEN         50
 
+
+/***********************************************************
+*  Implemention of the class CPriorityQueue
+
+************************************************************/
 /*  operators of tree struct, for heap process  */
 #define PARENT(i) (((i+1)>>1)-1)
 #define LEFT(i)      ((i<<1)+1)
 #define RIGHT(i)   ((i<<1)+2)
 
+
+CPriorityQueue::CPriorityQueue(){}
+CPriorityQueue::CPriorityQueue(TopList_T* topList)
+{
+	m_topList = topList;
+}
+
+CPriorityQueue::~CPriorityQueue(){}
+
+void CPriorityQueue::HeapUpdateTop( CombinStat_T* Obj)
+{
+    CopyCombinStats(&m_topList->List[0], Obj);
+    MinHeapify(0);
+}
+
+/***********************************************************
+Realize smallest priority queue with the element type is CombinStat_T
+************************************************************/
+void CPriorityQueue::MinHeapify( int current)
+{
+    int LeftChild;
+    int RightChild;
+    int smallest = current;
+
+    LeftChild = LEFT(current);
+    RightChild = RIGHT(current);
+
+    if ((LeftChild < m_topList->size) && (m_topList->List[current].value > m_topList->List[LeftChild].value))
+    {
+        smallest = LeftChild;
+    }
+
+    if ((RightChild < m_topList->size) && (m_topList->List[smallest].value > m_topList->List[RightChild].value))
+    {
+        smallest = RightChild;
+    }
+
+    if(current != smallest)
+    {
+        SwapCombinStats(&m_topList->List[current], &m_topList->List[smallest]);
+
+        MinHeapify(smallest);
+    }
+}
+
+
+void CPriorityQueue::HeapPop()
+{
+    CopyCombinStats(&m_topList->List[0], &m_topList->List[m_topList->size-1]);
+    m_topList->size --;
+    MinHeapify(0);
+}
+
+void CPriorityQueue::HeapPush(CombinStat_T* Obj)
+{
+    int current;
+    int parent;
+    memcpy(&m_topList->List[m_topList->size], Obj, sizeof(CombinStat_T));
+    m_topList->size ++;
+
+    current = m_topList->size -1;
+    while(current >= 1)
+    {
+        parent = PARENT(current);
+        if (m_topList->List[current].value < m_topList->List[parent].value)
+        {
+            SwapCombinStats(&m_topList->List[current], &m_topList->List[parent]);
+            current = parent;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+/***********************************************************
+Swap combinId Status
+************************************************************/
+void CPriorityQueue::SwapCombinStats(CombinStat_T* obj1, CombinStat_T* obj2)
+{
+    CombinStat_T Temp;
+    CopyCombinStats(&Temp, obj1);
+    CopyCombinStats(obj1, obj2);
+    CopyCombinStats(obj2, &Temp);
+}
+
+/***********************************************************
+Swap combinId Status
+************************************************************/
+void CPriorityQueue::CopyCombinStats(CombinStat_T* src, CombinStat_T* dest)
+{
+    src->value = dest->value;
+    src->cost1 = dest->cost1;
+    src->cost2 = dest->cost2;
+    src->combinId = dest->combinId;    
+}
+
+
+
+/***********************************************************
+*  Implemention of the class CKnapsack
+
+************************************************************/
 
 int CKnapsack::m_count  = 0;
 
@@ -45,7 +154,13 @@ CKnapsack::CKnapsack(const Knapsack_T* knapsack, TopList_T* topList):m_priorityQ
 		
 	m_traceFp        = NULL;
 	
-	memcpy(&m_knapsack, knapsack, sizeof(Knapsack_T));
+	m_knapsack.caseNum = knapsack->caseNum;
+	m_knapsack.caseKinds = knapsack->caseKinds;
+	m_knapsack.limitCost1 = knapsack->limitCost1;
+	m_knapsack.limitCost2 = knapsack->limitCost2;
+	m_knapsack.Values = knapsack->Values;
+	m_knapsack.Costs1 = knapsack->Costs1;
+	m_knapsack.Costs2 = knapsack->Costs2;	
 
 	AllocInfoInit();
 
@@ -88,10 +203,8 @@ void CKnapsack::KnapsackCombinationSearch()
             printf(" *** Hit the max search number: %d !\n", MAX_SEARCH);
             break;
         }
-      
         NextAllocationControlProcess();          
     }
-    
     PrintSearchedStatisticsInfo();
 
 }//----------------------------------------------------------------------------------
@@ -99,11 +212,17 @@ void CKnapsack::KnapsackCombinationSearch()
 
 void CKnapsack::AllocInfoInit()
 {
-    memset(&m_allocInfo, 0, sizeof(AllocInfo_T));
+    BranchRoot_T branchRoot;
+    memset(&branchRoot, 0, sizeof(BranchRoot_T));
     
     m_allocInfo.caseNum = m_knapsack.caseNum;
+    m_allocInfo.depth = 0;
+    m_allocInfo.currentMinValue = 0;
+    m_allocInfo.searchNum = 0;
+    m_allocInfo.updateNum = 0;
+    m_allocInfo.BranchRoot = branchRoot;
 
-    memset(m_allocInfo.Combin.combinId, 0, sizeof(int)*(m_allocInfo.caseNum+1));   
+    m_allocInfo.Combin.combinId.assign(m_allocInfo.caseNum+1, 0);
     m_allocInfo.Combin.combinId[0] = m_knapsack.caseKinds -1; // init the first value 
 }
 
@@ -287,104 +406,14 @@ void CKnapsack::SearchingLogTrace()
     PrintArrayToTraceFile(m_allocInfo.Combin.combinId, printNum);
 }
 
-void CKnapsack::PrintArrayToTraceFile(int array[], int printLen)
+void CKnapsack::PrintArrayToTraceFile(VI list, int printLen)
 {
     int i;
     for ( i=0; i<printLen; i++) 
     {
-        fprintf(m_traceFp, "%d ", array[i]);
+        fprintf(m_traceFp, "%d ", list[i]);
     }    
     //fprintf(m_traceFp, "\n");
 }
-
-
-
-CPriorityQueue::CPriorityQueue(){}
-CPriorityQueue::CPriorityQueue(TopList_T* topList)
-{
-	m_topList = topList;
-}
-
-CPriorityQueue::~CPriorityQueue(){}
-
-void CPriorityQueue::HeapUpdateTop( CombinStat_T* Obj)
-{
-    memcpy(&m_topList->List[0], Obj, sizeof(CombinStat_T));
-    MinHeapify(0);
-}
-
-/***********************************************************
-Realize smallest priority queue with the element type is CombinStat_T
-************************************************************/
-void CPriorityQueue::MinHeapify( int current)
-{
-    int LeftChild;
-    int RightChild;
-    int smallest = current;
-
-    LeftChild = LEFT(current);
-    RightChild = RIGHT(current);
-
-    if ((LeftChild < m_topList->size) && (m_topList->List[current].value > m_topList->List[LeftChild].value))
-    {
-        smallest = LeftChild;
-    }
-
-    if ((RightChild < m_topList->size) && (m_topList->List[smallest].value > m_topList->List[RightChild].value))
-    {
-        smallest = RightChild;
-    }
-
-    if(current != smallest)
-    {
-        SwapCombinStats(&m_topList->List[current], &m_topList->List[smallest]);
-
-        MinHeapify(smallest);
-    }
-}
-
-
-void CPriorityQueue::HeapPop()
-{
-    memcpy(&m_topList->List[0], &m_topList->List[m_topList->size-1], sizeof(CombinStat_T));
-    m_topList->size --;
-    MinHeapify(0);
-}
-
-void CPriorityQueue::HeapPush(CombinStat_T* Obj)
-{
-    int current;
-    int parent;
-    memcpy(&m_topList->List[m_topList->size], Obj, sizeof(CombinStat_T));
-    m_topList->size ++;
-
-    current = m_topList->size -1;
-    while(current >= 1)
-    {
-        parent = PARENT(current);
-        if (m_topList->List[current].value < m_topList->List[parent].value)
-        {
-            SwapCombinStats(&m_topList->List[current], &m_topList->List[parent]);
-            current = parent;
-        }
-        else
-        {
-            break;
-        }
-    }
-}
-
-/***********************************************************
-Swap combinId Status
-************************************************************/
-void CPriorityQueue::SwapCombinStats(CombinStat_T* obj1, CombinStat_T* obj2)
-{
-    CombinStat_T Temp;
-    memcpy(&Temp, obj1, sizeof(CombinStat_T));
-    memcpy(obj1, obj2, sizeof(CombinStat_T));
-    memcpy(obj2, &Temp, sizeof(CombinStat_T));
-}
-
-
 
 

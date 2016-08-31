@@ -10,39 +10,46 @@
 #define _KNAPSACK_HPP
 
 #include <string>
+#include <vector>
+//#include <map>
 
 /***************************************************
  Constant definitions
 ***************************************************/
-#define TOP_LIST_SIZE    60     // set your TOP_LIST_SIZE
+//#define TOP_LIST_SIZE    60     // set your TOP_LIST_SIZE
 
-#define MaxCaseKinds      100   // set your MaxCaseKinds
-#define MaxCaseNum       100   // set your MaxCaseNum
+//#define MaxCaseKinds      100   // set your MaxCaseKinds
+//#define MaxCaseNum       100   // set your MaxCaseNum
 
 /***************************************************/
+
+typedef std::vector<int>    VI;
+typedef std::vector<float> VF;
+
 
 //struct of Combination Status
 typedef struct {
    int    value; 
    int    cost1;  
    float cost2;  
-   int    combinId[MaxCaseNum+1]; 
+   VI    combinId;  	//[MaxCaseNum+1]; 
 }CombinStat_T;
+
 
 typedef struct {
    int size;
-   CombinStat_T List[TOP_LIST_SIZE]; 
+   std::vector<CombinStat_T>  List; 
 }TopList_T; 
 
         
 typedef struct{
     int    caseNum;  
-    int    caseKinds;    
-    int    Values[MaxCaseKinds]; 
-    int    Costs1[MaxCaseKinds]; 
-    float Costs2[MaxCaseKinds];
-    int    limitCost1;
-    float  limitCost2;    
+    int    caseKinds; 
+    int     limitCost1;
+    float  limitCost2;
+    VI     Values;   //[MaxCaseKinds]; 
+    VI     Costs1;  //[MaxCaseKinds]; 
+    VF     Costs2;  //[MaxCaseKinds];  
 }Knapsack_T;
 
 
@@ -86,6 +93,7 @@ private:
 	void MinHeapify( int);
 	void HeapPush(CombinStat_T*);
 	void SwapCombinStats(CombinStat_T* , CombinStat_T*);
+       void CopyCombinStats(CombinStat_T* src, CombinStat_T* dest);
 	
 };
 
@@ -170,9 +178,11 @@ public:
 
 private:
 	FILE             * m_traceFp;
-	TopList_T      * m_topList;
+	TopList_T     * m_topList;
 	static int         m_count;
 	Knapsack_T     m_knapsack;
+	int 			 m_maxCaseKinds;
+	int 			 m_maxCaseNum;
 	AllocInfo_T      m_allocInfo;
 	CPriorityQueue m_priorityQueue;
 	
@@ -186,7 +196,7 @@ private:
 	void AllocRollbackToBranchRoot();
 	void TopListUpdate();
 	void SearchingLogTrace();
-	void PrintArrayToTraceFile( int*, int);
+	void PrintArrayToTraceFile(VI, int);
 
 };
 

@@ -5,7 +5,7 @@
  
 
 # TODO:
-	1. refactor the code of 'CompletelyKnapsack_problem' to a complete interface;  [Done]
-	   Write a c++ version with classes and template parameters;                   [Done]
+	1. refactor the code of 'CompletelyKnapsack_problem' to a complete interface;  				  [Done]
+	   Write a c++ version with classes and template parameters make it more general;            
 
 
