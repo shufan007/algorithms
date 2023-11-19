@@ -1,0 +1,15 @@
+//评测题目:
+//1. 写下 二叉树遍历
+//2. 写下 单链表 倒排
+//3.Create Table: CREATE TABLE `test1` (
+//   `id` int(11) NOT NULL AUTO_INCREMENT,
+//   `name` varchar(20) DEFAULT NULL,
+//   `course` varchar(20) DEFAULT NULL,
+//   `score` int(11) DEFAULT NULL,
+//   PRIMARY KEY (`id`)
+// ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8
+// 1 row in set (0.00 sec)
+//  查询每门课分数最高的学生及成绩
+
+
+

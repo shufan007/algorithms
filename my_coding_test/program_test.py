@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar 27 20:29:28 2020
+
+@author: Administrator
+"""
+
+"""
+1. 一只青蛙一次可以跳上1级台阶，也可以跳上 2 级。求该青蛙跳上一个 n 级的台阶总共有多少种跳法？
+"""
+
+#递归
+def func1(n):
+    if (n<=0):
+        return 0
+    elif n==1:
+        return 1
+    elif n==2:
+        return 2
+    else:
+        return func1(n-1)+func1(n-2)
+
+#非递归		
+def func2(n):
+    if (n<=0):
+        return 0
+    elif n==1:
+        return 1
+    elif n==2:
+        return 2
+    else:
+        f1,f2=1,2
+        for i in range(n-2):
+            f=f1+f2
+            f1,f2=f2,f
+        return f
+    
+"""test""" 
+n=5    
+print(func1(n))   
+print(func2(n)) 
+"""
+2. 输入一个正数n，输出所有和为n连续正数序列。例如输入15，由于1+2+3+4+5=4+5+6=7+8=15，所以输出3个连续序列1-5、4-6和7-8
+
+"""
+def find_seq(s):
+    if s<3:
+        return
+    n1,n2=1,2
+    m=(1+s)//2
+    s1 = n1+n2
+    
+    while(n1<m):
+        if s1 == s:
+            print('%d-%d'%(n1,n2))
+        while(s1>s and n1<n2):
+            s1-=n1
+            n1+=1
+            if s1 == s:
+                print('%d-%d'%(n1,n2))
+        n2+=1
+        s1+=n2
+
+
+"""test"""  
+print(find_seq(15))

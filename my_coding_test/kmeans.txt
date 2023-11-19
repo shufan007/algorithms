@@ -1,0 +1,29 @@
+//评测题目: 无
+
+def kmeans(X,k,max_iter,stop_dis=0.001):
+	center_list = []
+    k1=k
+	while k1>1:
+		center_list.append(rand(X))
+        k1-=1
+    min_dis = Inf
+    while max_iter>0 or min_dis<stop_dis:
+      class_list=[0 for i in range(len(X))]
+      for i in range(len(X)):
+          d_min = 0
+          curr_class=0
+          for j in range(k):
+              xi=distace(X[i],c)
+              if xi<d_min:
+                  curr_class=j
+          class_list[i] = j
+
+      center_list = [0]*k
+      class_count_list = [0]*k
+      for i in range(len(X)):
+          center_list[class_list[i]]+=X[i]
+          class_count_list[class_list[i]]+=1
+
+      center_list = center_list/class_count_list
+    
+		

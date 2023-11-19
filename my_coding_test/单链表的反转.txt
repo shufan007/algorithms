@@ -1,0 +1,51 @@
+﻿//评测题目一：
+// 1、定义单链表的数据结构
+struct NodeList {
+  NodeList * next;
+  int data;
+};
+
+// 2、实现单链表的反转 例如: A -> B -> C -> D -> NULL 翻转后的结果是 D -> C -> B -> A -> NULL
+
+NodeList* ListReverse(NodeList* pHead)
+{
+  NodeList *p,*pNext,*pPrev;
+  
+  p = pHead;
+  pPrev = NULL;
+  while(p!=NULL)
+  {
+    pNext = p->next;
+    p->next = pPrev;
+    pPrev = p;
+	p = pNext;
+  }
+  return p;
+}
+
+//评测题目二：
+// 给定俩个升序序列，实现一个函数将两个升序序列变成一个升序序列.
+def ListMerge(List1,List2):
+    i,j = 0,0
+    New_list = []
+	while (i<len(List1) and j<len(List2)):
+		if List1[i]<=List2[j]:
+			New_list.append(List1[i])
+			i+=1
+        else:
+            New_list.append(List2[j])
+			j+=1
+			
+    while(i <= len(List1))
+        New_list.append(List1[i])
+		i+=1
+
+    while(j<len(List2)
+        New_list.append(List2[j])
+		j+=1
+		
+    return New_list
+		
+		
+		
+		
